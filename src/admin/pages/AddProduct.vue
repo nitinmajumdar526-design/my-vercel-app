@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const title = ref('')
 const description = ref('')
 const amount = ref('')
@@ -17,21 +19,27 @@ const handleImage = (e) => {
 
 const addProduct = async () => {
   message.value = ''
-  const formData = new FormData()
-  formData.append('title', title.value)
-  formData.append('description', description.value)
-  formData.append('amount', amount.value)
-  formData.append('sku', sku.value)
-  formData.append('image', image.value)
 
   try {
-    const res = await fetch('http://localhost:5000/api/products', {
+    const formData = new FormData()
+    formData.append('title', title.value)
+    formData.append('description', description.value)
+    formData.append('amount', amount.value)
+    formData.append('sku', sku.value)
+
+    if (image.value) {
+      formData.append('image', image.value)
+    }
+
+    const res = await fetch(`${API_URL}/api/products`, {
       method: 'POST',
       body: formData
     })
+
     const data = await res.json()
+
     if (res.ok) {
-      message.value = data.message
+      message.value = data.message || 'Product added successfully'
       title.value = ''
       description.value = ''
       amount.value = ''
@@ -42,7 +50,8 @@ const addProduct = async () => {
       message.value = data.message || 'Product add failed'
     }
   } catch (error) {
-    message.value = 'Backend server band hai'
+    console.error(error)
+    message.value = 'Backend server se connect nahi ho raha'
   }
 }
 </script>
@@ -80,7 +89,6 @@ const addProduct = async () => {
           <label>Price (₹)</label>
           <input v-model="amount" type="number" placeholder="0.00" required />
         </div>
-        
       </div>
 
       <div class="ap-upload">

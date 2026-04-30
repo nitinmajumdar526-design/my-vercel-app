@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const API_URL = import.meta.env.VITE_API_URL
+
 const title = ref('')
 const images = ref([])
 const imagesLabel = ref('Click to upload multiple images')
@@ -16,20 +18,25 @@ const handleImages = (e) => {
 }
 
 const addGallery = async () => {
-  const formData = new FormData()
-  formData.append('title', title.value)
-  images.value.forEach((img) => formData.append('images', img))
+  try {
+    const formData = new FormData()
+    formData.append('title', title.value)
+    images.value.forEach((img) => formData.append('images', img))
 
-  const res = await fetch('http://localhost:5000/api/gallery', {
-    method: 'POST',
-    body: formData
-  })
+    const res = await fetch(`${API_URL}/api/gallery`, {
+      method: 'POST',
+      body: formData
+    })
 
-  const data = await res.json()
-  alert(data.message)
+    const data = await res.json()
+    alert(data.message || 'Gallery created')
 
-  if (res.ok) {
-    router.push('/admin/gallery')
+    if (res.ok) {
+      router.push('/admin/gallery')
+    }
+  } catch (err) {
+    console.error(err)
+    alert('Server se connect nahi ho raha')
   }
 }
 </script>
