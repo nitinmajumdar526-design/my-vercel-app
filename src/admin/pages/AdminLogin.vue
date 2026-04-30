@@ -32,7 +32,7 @@ const login = async () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: email.value,
+        email: email.value.trim(),
         password: password.value,
       }),
     })
@@ -44,11 +44,13 @@ const login = async () => {
       return
     }
 
-    localStorage.setItem("adminToken", data.token)
+    localStorage.setItem("adminToken", data.token || "user-login")
+    localStorage.setItem("adminUser", JSON.stringify(data.user || data))
+
     router.push("/admin/dashboard")
   } catch (err) {
-    error.value = "Server error"
     console.error(err)
+    error.value = "Server error"
   }
 }
 </script>
